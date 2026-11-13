@@ -201,6 +201,7 @@ footer{margin-top:clamp(100px,14vw,200px);background:var(--ink);color:var(--pape
   .row,.idxhead{grid-template-columns:44px 1fr 90px}.row>*:nth-child(3),.row>*:nth-child(4),.row>*:nth-child(5),.idxhead>*:nth-child(3),.idxhead>*:nth-child(4),.idxhead>*:nth-child(5){display:none}
   .hero-meta{grid-template-columns:1fr 1fr}.bar nav{display:none}.float{display:none}
 }
+.archive{margin:90px clamp(20px,4vw,56px) 0;border-top:1px solid var(--ink)}.archive summary{padding:22px 0;cursor:pointer;display:flex;justify-content:space-between;font-family:var(--cn);font-size:20px}.archive summary span{font:11px var(--mono);align-self:center;color:var(--mute)}.archive section.wrap{padding-left:0;padding-right:0}.versions{display:flex;gap:8px;margin-bottom:14px}.versions button{border:1px solid #777;color:var(--paper);background:none;font:12px var(--sans);padding:8px 14px;border-radius:30px;cursor:pointer}.versions button.active{background:var(--paper);color:var(--ink)}.versions button:disabled{opacity:.4;cursor:default}
 </style>
 </head>
 <body>
@@ -209,7 +210,7 @@ footer{margin-top:clamp(100px,14vw,200px);background:var(--ink);color:var(--pape
 <header class="bar mono">
   <a href="#">Richi L.</a>
   <span class="clock" id="clock">Video Works · 2026</span>
-  <nav><a href="#selected">Top 5</a><a href="#watch">More</a><a href="#index">Index</a><a href="#timeline">Timeline</a></nav>
+  <nav><a href="#selected">Top 5</a><a href="#watch">More</a><a href="#archive">Archive</a></nav>
 </header>
 
 <section class="hero wrap" style="padding-top:110px">
@@ -244,6 +245,7 @@ footer{margin-top:clamp(100px,14vw,200px);background:var(--ink);color:var(--pape
   <div class="watch" id="watchGrid"></div>
 </section>
 
+<details id="archive" class="archive"><summary>交付记录 <span>Delivery archive ＋</span></summary>
 <section id="index" class="wrap">
   <div class="sh rv">
     <h2>Index</h2>
@@ -261,6 +263,7 @@ footer{margin-top:clamp(100px,14vw,200px);background:var(--ink);color:var(--pape
   <div class="tl rv"><div class="track" id="track"></div><div class="months" id="months"></div></div>
 </section>
 
+</details>
 <footer>
   <div class="wrap">
     <div class="mono" style="opacity:.6;margin-bottom:24px">( End of reel )</div>
@@ -272,7 +275,7 @@ footer{margin-top:clamp(100px,14vw,200px);background:var(--ink);color:var(--pape
 <div class="float" id="float"></div>
 
 <div class="modal" id="modal"><div class="box">
-  <div class="media" id="mMedia"></div>
+  <div class="versions" id="versions"></div><div class="media" id="mMedia"></div>
   <div class="mb"><div><div class="mono" id="mMeta" style="opacity:.6;margin-bottom:8px"></div><h3 id="mTitle"></h3></div><button id="mClose">Close ✕</button></div>
 </div></div>
 
@@ -395,20 +398,23 @@ $('#sel').innerHTML = TOP.map((w,i)=>`
 const WATCH_ORDER=['team','arena','ai2','ai1','wc','mc','us-en','us-tw','us-vi','ah-tw','mc-tw','grid','copy','pre','swap'];
 const ALLPLAY = WORKS.filter(w=>w.url);
 const TOPIDS = TOP.map(t=>t.ref);
-const PLAYABLE = ALLPLAY.filter(w=>!TOPIDS.includes(w.id)).sort((a,b)=>WATCH_ORDER.indexOf(a.id)-WATCH_ORDER.indexOf(b.id));
+const LANG_GROUPS={'us-en':['us-en','us-tw','us-vi'], 'ah-tw':['ah-tw','ah-en']};
+const VERSION_ONLY=new Set(['us-tw','us-vi','ah-en']);
+const DISPLAY_WORKS=WORKS.filter(w=>!VERSION_ONLY.has(w.id));
+const PLAYABLE = ALLPLAY.filter(w=>!TOPIDS.includes(w.id)&&!VERSION_ONLY.has(w.id)).sort((a,b)=>WATCH_ORDER.indexOf(a.id)-WATCH_ORDER.indexOf(b.id));
 $('#watchGrid').innerHTML = PLAYABLE.map((w,i)=>`
   <article class="wcard rv" data-ref="${w.id}">${poster(w,i+TOP.length,'s')}
-    <h4>${w.t}${w.l.length?' · '+w.l.join('/'):''}</h4><p>${w.desc}</p>
+    <h4>${w.t}${LANG_GROUPS[w.id]?' · '+LANG_GROUPS[w.id].map(id=>WORKS.find(x=>x.id===id).l.join('/')).join(' / '):(w.l.length?' · '+w.l.join('/'):'')}</h4><p>${w.desc}</p>
     <div class="wm mono"><span>${w.d}</span><span>${w.dur}</span></div></article>`).join('');
 /* index */
 const LIVE='▶ 可观看';
 const cats = ['全部',LIVE,...new Set(WORKS.map(w=>w.c))];
 let cur='全部';
-const cnt=c=>c==='全部'?WORKS.length:c===LIVE?ALLPLAY.length:WORKS.filter(w=>w.c===c).length;
+const cnt=c=>c==='全部'?DISPLAY_WORKS.length:c===LIVE?DISPLAY_WORKS.filter(w=>w.url).length:DISPLAY_WORKS.filter(w=>w.c===c).length;
 const renderF=()=>$('#filters').innerHTML=cats.map(c=>`<button class="${c===cur?'on':''}" data-c="${c}">${c}<sup>${cnt(c)}</sup></button>`).join('');
 renderF();
-$('#list').innerHTML = WORKS.map((w,i)=>`
-  <li class="row" data-ref="${w.id}" data-c="${w.c}" data-live="${w.url?1:0}" data-i="${i}">
+$('#list').innerHTML = DISPLAY_WORKS.map((w,i)=>`
+  <li class="row" data-ref="${w.id}" data-c="${w.c}" data-live="${w.url?1:0}" data-i="${WORKS.indexOf(w)}">
     <span class="no">${String(i+1).padStart(2,'0')}</span>
     <span class="tt">${w.t}${w.url?'<span class="live">Play</span>':''}<small>${w.en}</small></span>
     <span class="mono">${w.c}</span>
@@ -435,7 +441,7 @@ for(let i=0;i<=days;i+=1){
   const isM = dt.getDate()===1;
   if(isM||i%7===0) tk+=`<div class="tick ${isM?'m':''}" style="left:${i/days*100}%">${isM&&i<days?`<em>${dt.toLocaleString('en',{month:'short'}).toUpperCase()} 2026</em>`:''}</div>`;
 }
-const DATED=WORKS.filter(w=>w.d);
+const DATED=DISPLAY_WORKS.filter(w=>w.d);
 const groups={}; DATED.forEach(w=>(groups[w.d]=groups[w.d]||[]).push(w));
 Object.entries(groups).forEach(([d,ws])=>{
   tk+=`<div class="mk" style="left:${pos(d)}%">${ws.map(()=>'<i></i>').join('')}<b>${d.slice(5)} · ${ws.length} 支</b></div>`;
@@ -451,13 +457,19 @@ function embed(url){
   if(/\.(mp4|webm|mov)(\?|$)/i.test(url)) return `<video src="${url}" controls autoplay></video>`;
   return `<a href="${url}" target="_blank" style="color:#ece8df;border:1px solid;padding:12px 20px;border-radius:99px">在新窗口打开 ↗</a>`;
 }
-document.addEventListener('click',e=>{
-  const el=e.target.closest('[data-ref]'); if(!el) return;
-  const w=WORKS.find(x=>x.id===el.dataset.ref);
+function showFilm(id,group){
+  const w=WORKS.find(x=>x.id===id);
   $('#mTitle').textContent=w.t+(w.l.length?' · '+w.l.join('/'):'');
   $('#mMeta').textContent=[w.d,w.c,w.en].filter(Boolean).join(' — ');
-  $('#mMedia').innerHTML=w.url?embed(w.url):'该作品暂未收录在线版本';
+  $('#mMedia').innerHTML=w.url?embed(w.url):'该语言版本暂未收录';
+  
+  const ids=LANG_GROUPS[group]||[];
+  $('#versions').innerHTML=ids.map(i=>{const x=WORKS.find(y=>y.id===i);return '<button data-version="'+i+'" data-group="'+group+'" class="'+(i===id?'active':'')+'" '+(!x.url?'disabled':'')+'>'+x.l.join('/')+(!x.url?' · 待补':'')+'</button>';}).join('');
   $('#modal').classList.add('open');
+}
+document.addEventListener('click',e=>{
+  const ver=e.target.closest('[data-version]');if(ver){showFilm(ver.dataset.version,ver.dataset.group);return;}
+  const el=e.target.closest('[data-ref]');if(el)showFilm(el.dataset.ref,el.dataset.ref);
 });
 const closeM=()=>{$('#modal').classList.remove('open');$('#mMedia').innerHTML='';};
 $('#mClose').onclick=closeM; $('#modal').addEventListener('click',e=>{if(e.target.id==='modal')closeM();});
