@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Richi L — AI Video Works 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Noto+Serif+SC:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#ece8df; --paper2:#e3ded3; --ink:#111110; --mute:#76726a; --line:rgba(17,17,16,.16);
+  --acc:#ff4a1c;
+  --serif:"Instrument Serif","Noto Serif SC","Songti SC",serif;
+  --cn:"Noto Serif SC","Songti SC","SimSun",serif;
+  --sans:"Inter Tight","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+::selection{background:var(--acc);color:var(--paper)}
+a{color:inherit;text-decoration:none}
+/* grain */
+body::after{content:"";position:fixed;inset:-50%;z-index:100;pointer-events:none;opacity:.09;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation:grain 1s steps(4) infinite}
+@keyframes grain{25%{transform:translate(-3%,2%)}50%{transform:translate(2%,-3%)}75%{transform:translate(-2%,-1%)}}
+.wrap{padding:0 clamp(20px,4vw,56px)}
+.mono{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+/* cursor */
+.cur{position:fixed;left:0;top:0;width:10px;height:10px;border-radius:50%;background:var(--acc);pointer-events:none;z-index:200;transform:translate(-50%,-50%);transition:width .25s,height .25s,background .25s;mix-blend-mode:multiply}
+.cur.big{width:84px;height:84px;background:var(--ink);mix-blend-mode:normal}
+.cur span{position:absolute;inset:0;display:grid;place-items:center;color:var(--paper);font-family:var(--mono);font-size:10px;letter-spacing:.1em;opacity:0;transition:.2s}
+.cur.big span{opacity:1}
+@media (hover:none){.cur{display:none}}
+/* top bar */
+.bar{position:fixed;top:0;left:0;right:0;z-index:50;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;height:58px;padding:0 clamp(20px,4vw,56px);mix-blend-mode:difference;color:#fff}
+.bar nav{display:flex;gap:26px;justify-self:end}
+.bar nav a{position:relative}
+.bar nav a::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:1px;background:currentColor;transform:scaleX(0);transform-origin:right;transition:transform .4s}
+.bar nav a:hover::after{transform:scaleX(1);transform-origin:left}
+.clock{justify-self:center}
+/* hero */
+.hero{display:flex;flex-direction:column;justify-content:flex-end;padding-top:110px;position:relative}
+.hero .name{font-size:clamp(80px,15vw,240px)}
+#selected{padding-top:clamp(50px,6vw,90px)!important}
+.hero-meta{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;border-top:1px solid var(--ink);padding-top:14px;margin-bottom:28px}
+.hero-meta div b{display:block;font-weight:500;color:var(--mute);margin-bottom:6px}
+.name{font-family:var(--serif);font-weight:400;font-size:clamp(90px,22vw,360px);line-height:.78;letter-spacing:-.045em;display:flex;align-items:flex-end;justify-content:space-between;overflow:hidden}
+.name .ln{display:inline-block;transform:translateY(105%);animation:up 1.2s cubic-bezier(.2,.8,.1,1) forwards}
+.name .ln:nth-child(2){animation-delay:.12s}
+.name i{font-style:italic;color:var(--acc)}
+@keyframes up{to{transform:none}}
+.hero-sub{display:flex;justify-content:space-between;align-items:flex-end;gap:30px;padding:30px 0 34px;border-bottom:1px solid var(--ink)}
+.hero-sub p{font-family:var(--cn);font-size:clamp(18px,1.8vw,24px);line-height:1.6;max-width:640px;font-weight:500}
+.hero-sub p em{font-family:var(--serif);font-style:italic;font-size:1.15em;font-weight:400}
+.scroll{display:flex;align-items:center;gap:10px}
+.scroll i{width:1px;height:46px;background:var(--ink);position:relative;overflow:hidden}
+.scroll i::after{content:"";position:absolute;left:0;top:-50%;width:1px;height:50%;background:var(--acc);animation:drop 1.6s infinite}
+@keyframes drop{to{top:100%}}
+/* marquee */
+.marquee{overflow:hidden;border-bottom:1px solid var(--ink);padding:18px 0;background:var(--ink);color:var(--paper)}
+.marquee .track{display:flex;width:max-content;animation:mq 40s linear infinite}
+.marquee span{font-family:var(--cn);font-size:clamp(22px,2.6vw,36px);font-weight:700;padding-right:44px;white-space:nowrap;display:flex;align-items:center;gap:44px}
+.marquee span::after{content:"✳";color:var(--acc);font-size:.8em}
+@keyframes mq{to{transform:translateX(-50%)}}
+/* section heads */
+section.wrap{padding-top:clamp(110px,13vw,200px)}
+.sh{display:grid;grid-template-columns:1fr 2fr;gap:20px;align-items:end;border-bottom:1px solid var(--ink);padding-bottom:18px;margin-bottom:0}
+.sh h2{font-family:var(--serif);font-weight:400;font-size:clamp(56px,9vw,140px);line-height:.85;letter-spacing:-.03em}
+.sh h2 i{color:var(--acc)}
+.sh .r{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap}
+.sh .r p{font-family:var(--cn);font-size:15px;line-height:1.7;max-width:380px;color:#3a3833}
+/* numbers */
+.nums{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--ink)}
+.num{padding:34px 20px 28px;border-right:1px solid var(--line)}
+.num:last-child{border-right:0}
+.num b{font-family:var(--serif);font-weight:400;font-size:clamp(70px,9vw,140px);line-height:.9;letter-spacing:-.04em;display:block}
+.num b sup{font-size:.3em;color:var(--acc);vertical-align:top;margin-left:4px}
+.num span{font-family:var(--cn);font-size:14px;color:#3a3833;display:block;margin-top:12px}
+/* posters */
+.poster{position:relative;aspect-ratio:16/10;overflow:hidden;background:var(--pbg);color:var(--pfg);isolation:isolate}
+.poster .shape{position:absolute;z-index:-1}
+.poster .t{position:absolute;left:6%;bottom:8%;right:16%;font-family:var(--cn);font-weight:900;line-height:1;letter-spacing:-.02em}
+.poster .e{position:absolute;left:6%;top:7%;font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase}
+.poster .n{position:absolute;right:6%;top:4%;font-family:var(--serif);font-style:italic;line-height:1}
+.poster .pl{position:absolute;right:5%;bottom:7%;width:54px;height:54px;border-radius:50%;border:1px solid currentColor;display:grid;place-items:center;transition:.4s}
+.poster .pl svg{width:14px;fill:currentColor;margin-left:3px}
+.poster.img{background:#000}
+.poster.img img,.poster.img video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-1;transition:opacity .5s}
+.poster.img video{opacity:0}
+.poster.img.playing video{opacity:1}
+.poster.img::before{content:"";position:absolute;inset:0;z-index:0;background:linear-gradient(180deg,rgba(0,0,0,.45),transparent 30%,transparent 70%,rgba(0,0,0,.35));pointer-events:none}
+.poster.img .e,.poster.img .n,.poster.img .pl{z-index:1;color:#fff}
+.poster.img .n{text-shadow:0 4px 30px rgba(0,0,0,.4)}
+.live{display:inline-flex;align-items:center;gap:6px;font:500 10px var(--mono);letter-spacing:.1em;color:var(--acc);text-transform:uppercase;vertical-align:middle;margin-left:10px}
+.live::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--acc)}
+/* watch strip */
+.wcard .poster .e{right:30%;line-height:1.6}
+.wcard .poster{aspect-ratio:16/10!important}
+.wcard .poster .n{font-size:64px!important}
+.watch{display:grid;grid-template-columns:repeat(2,1fr);gap:clamp(12px,1.4vw,20px);padding-top:clamp(40px,5vw,70px)}
+.wcard{cursor:pointer}
+.wcard .poster{aspect-ratio:4/5}
+.wcard .poster .n{font-size:42px}
+.wcard h4{font-family:var(--cn);font-weight:700;font-size:17px;margin-top:14px;line-height:1.35}
+.wcard p{font-family:var(--cn);font-size:13px;line-height:1.65;color:#3a3833;margin-top:6px}
+.wcard .wm{display:flex;justify-content:space-between;margin-top:12px;padding-top:10px;border-top:1px solid var(--line);color:var(--mute)}
+.wcard:hover .pl{background:#fff;color:#111}
+@media(max-width:700px){.watch{grid-template-columns:1fr}}
+/* selected */
+.sel{display:grid;grid-template-columns:repeat(12,1fr);column-gap:clamp(16px,2vw,28px);row-gap:clamp(60px,8vw,120px);padding-top:clamp(50px,6vw,90px)}
+.item{cursor:pointer}
+.item .pwrap{overflow:hidden;transition:clip-path 1.2s cubic-bezier(.2,.8,.1,1);clip-path:inset(12% 0 12% 0)}
+.item.show .pwrap{clip-path:inset(0)}
+.item .poster{transition:transform 1.2s cubic-bezier(.2,.8,.1,1)}
+.item:hover .poster{transform:scale(1.04)}
+.item:hover .pl{background:var(--pfg);color:var(--pbg)}
+.item .cap{display:grid;grid-template-columns:auto 1fr auto;gap:18px;align-items:start;padding-top:16px;border-top:1px solid var(--ink);margin-top:16px}
+.item .idx{font-family:var(--serif);font-style:italic;font-size:44px;line-height:.8;color:var(--acc)}
+.item h3{font-family:var(--cn);font-weight:700;font-size:clamp(22px,2.2vw,32px);line-height:1.2;letter-spacing:-.01em}
+.item h3 small{display:block;font-family:var(--serif);font-style:italic;font-weight:400;font-size:.68em;color:var(--mute);margin-top:4px;letter-spacing:0}
+.item .d{font-family:var(--cn);font-size:14px;line-height:1.7;color:#3a3833;margin-top:10px;max-width:520px}
+.item .meta{text-align:right;line-height:1.9}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+.tag{font-family:var(--mono);font-size:10px;letter-spacing:.08em;padding:4px 9px;border:1px solid var(--ink);border-radius:99px;text-transform:uppercase}
+.tag.l{background:var(--ink);color:var(--paper)}
+.i1{grid-column:1 / span 8}
+.i2{grid-column:9 / span 4;align-self:end}
+.i3{grid-column:2 / span 5}
+.i4{grid-column:8 / span 5;margin-top:18vh}
+.i5{grid-column:3 / span 8}
+/* index */
+.filters{display:flex;gap:4px;flex-wrap:wrap}
+.filters button{font:500 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;background:none;border:1px solid var(--line);color:var(--ink);padding:8px 12px;border-radius:99px;cursor:pointer;transition:.25s}
+.filters button:hover{border-color:var(--ink)}
+.filters button.on{background:var(--acc);border-color:var(--acc);color:var(--paper)}
+.filters button sup{opacity:.6;margin-left:3px}
+.idxlist{list-style:none}
+.row{display:grid;grid-template-columns:70px 1.6fr 1fr .8fr .8fr 120px;gap:20px;align-items:center;padding:22px 0;border-bottom:1px solid var(--line);cursor:pointer;position:relative;transition:padding .4s cubic-bezier(.2,.8,.1,1),color .3s}
+.row::before{content:"";position:absolute;inset:0;background:var(--ink);transform:scaleY(0);transform-origin:bottom;transition:transform .45s cubic-bezier(.2,.8,.1,1);z-index:-1}
+.row:hover{color:var(--paper);padding-left:20px;padding-right:20px}
+.row:hover::before{transform:scaleY(1)}
+.row .no{font-family:var(--serif);font-style:italic;font-size:26px;color:var(--acc)}
+.row .tt{font-family:var(--cn);font-weight:700;font-size:clamp(18px,1.9vw,28px);letter-spacing:-.01em}
+.row .tt small{display:block;font-family:var(--serif);font-style:italic;font-weight:400;font-size:.6em;margin-top:2px;opacity:.6}
+.badge{position:absolute;top:120px;right:clamp(20px,4vw,56px);width:170px;height:170px;animation:spin 18s linear infinite}
+.badge text{font-family:var(--mono);font-size:10.5px;letter-spacing:.32em;fill:var(--ink)}
+.badge-c{position:absolute;top:120px;right:clamp(20px,4vw,56px);width:170px;height:170px;display:grid;place-items:center;font-family:var(--serif);font-style:italic;font-size:46px;color:var(--acc)}
+.hero-note{position:absolute;top:130px;left:clamp(20px,4vw,56px);max-width:360px;font-family:var(--serif);font-style:italic;font-size:clamp(22px,2.2vw,32px);line-height:1.15;color:var(--mute)}
+.hero-note b{font-style:normal;font-weight:400;color:var(--ink)}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(max-width:900px){.badge,.badge-c,.hero-note{display:none}}
+.row .dt{text-align:right}
+.row.hide{display:none}
+.idxhead{display:grid;grid-template-columns:70px 1.6fr 1fr .8fr .8fr 120px;gap:20px;padding:14px 0;border-bottom:1px solid var(--ink);color:var(--mute)}
+.idxhead span:last-child{text-align:right}
+.float{position:fixed;left:0;top:0;width:340px;pointer-events:none;z-index:60;opacity:0;transform:translate(-50%,-50%) scale(.8) rotate(-4deg);transition:opacity .3s,transform .4s cubic-bezier(.2,.8,.1,1);box-shadow:0 30px 60px -20px rgba(0,0,0,.45)}
+.float.on{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(-2deg)}
+/* timeline */
+.tl{padding-top:60px}
+.track{position:relative;height:120px;border-bottom:1px solid var(--ink)}
+.track .tick{position:absolute;bottom:0;width:1px;height:10px;background:var(--line)}
+.track .tick.m{height:30px;background:var(--ink)}
+.track .tick.m em{position:absolute;bottom:36px;left:6px;font-style:normal;font-family:var(--mono);font-size:11px;letter-spacing:.08em;white-space:nowrap}
+.mk{position:absolute;bottom:0;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:3px}
+.mk i{display:block;width:12px;height:12px;border-radius:50%;background:var(--acc);border:2px solid var(--paper)}
+.mk:hover i{background:var(--ink)}
+.mk b{position:absolute;bottom:calc(100% + 8px);font:500 10px var(--mono);white-space:nowrap;background:var(--ink);color:var(--paper);padding:4px 7px;opacity:0;transition:.2s;pointer-events:none}
+.mk:hover b{opacity:1}
+.months{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:0}
+.mo{padding:30px 20px 10px 0;border-right:1px solid var(--line)}
+.mo:last-child{border-right:0}
+.mo h4{font-family:var(--serif);font-weight:400;font-size:64px;line-height:.9;letter-spacing:-.03em}
+.mo h4 i{color:var(--acc);font-size:.4em;margin-left:8px;vertical-align:top}
+.mo ul{list-style:none;margin-top:18px}
+.mo li{display:flex;gap:12px;padding:9px 0;border-top:1px solid var(--line);font-family:var(--cn);font-size:14px}
+.mo li span{font-family:var(--mono);font-size:11px;color:var(--mute);padding-top:3px;min-width:38px}
+/* footer */
+footer{margin-top:clamp(100px,14vw,200px);background:var(--ink);color:var(--paper);padding:80px 0 30px;overflow:hidden}
+.big{font-family:var(--serif);font-size:clamp(80px,17vw,280px);line-height:.85;letter-spacing:-.045em}
+.big i{color:var(--acc)}
+.fbot{display:flex;justify-content:space-between;margin-top:60px;padding-top:16px;border-top:1px solid rgba(236,232,223,.25);flex-wrap:wrap;gap:10px}
+/* modal */
+.modal{position:fixed;inset:0;z-index:150;background:rgba(17,17,16,.92);display:none;align-items:center;justify-content:center;padding:24px}
+.modal.open{display:flex;animation:fade .3s}
+@keyframes fade{from{opacity:0}}
+.modal .box{width:min(1000px,100%);color:var(--paper)}
+.modal .media{aspect-ratio:16/9;background:#000;display:grid;place-items:center;font-family:var(--cn);color:#9c978c;text-align:center}
+.modal .media iframe,.modal .media video{width:100%;height:100%;border:0}
+.modal .mb{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;padding-top:16px;border-top:1px solid rgba(236,232,223,.3);margin-top:16px}
+.modal h3{font-family:var(--cn);font-size:28px;font-weight:700}
+.modal button{font:500 11px var(--mono);letter-spacing:.1em;background:none;border:1px solid var(--paper);color:var(--paper);padding:10px 16px;border-radius:99px;cursor:pointer;text-transform:uppercase}
+/* reveal */
+.rv{opacity:0;transform:translateY(40px);transition:opacity 1s,transform 1s cubic-bezier(.2,.8,.1,1)}
+.rv.show{opacity:1;transform:none}
+@media(max-width:900px){
+  .sel>*{grid-column:1 / -1!important;margin-top:0!important}
+  .sh{grid-template-columns:1fr}.nums,.months{grid-template-columns:1fr 1fr}
+  .row,.idxhead{grid-template-columns:44px 1fr 90px}.row>*:nth-child(3),.row>*:nth-child(4),.row>*:nth-child(5),.idxhead>*:nth-child(3),.idxhead>*:nth-child(4),.idxhead>*:nth-child(5){display:none}
+  .hero-meta{grid-template-columns:1fr 1fr}.bar nav{display:none}.float{display:none}
+}
+</style>
+</head>
+<body>
+<div class="cur" id="cur"><span>PLAY</span></div>
+
+<header class="bar mono">
+  <a href="#">Richi L.</a>
+  <span class="clock" id="clock">Video Works · 2026</span>
+  <nav><a href="#selected">Top 5</a><a href="#watch">More</a><a href="#index">Index</a><a href="#timeline">Timeline</a></nav>
+</header>
+
+<section class="hero wrap" style="padding-top:110px">
+  <div class="hero-meta mono">
+    <div><b>Creator</b>Richi L</div>
+    <div><b>Client</b>MEXC</div>
+    <div><b>Discipline</b>AI Video Production</div>
+    <div><b>Period</b>2026</div>
+  </div>
+  <h1 class="name"><span class="ln">Richi</span><span class="ln"><i>L.</i></span></h1>
+  <div class="hero-sub">
+    <p>为 MEXC 制作的 AI 视频作品：品牌大片、剧情短片与产品教学。下面是我最好的 <em>5</em> 支作品。</p>
+    <div class="scroll mono"><i></i>Top 5</div>
+  </div>
+</section>
+
+<section id="selected" class="wrap">
+  <div class="sh rv">
+    <h2>Top <i>05</i></h2>
+    <div class="r"><p>最好的 5 支作品，全部可以直接播放。悬停预览，点击观看。</p><span class="mono">( Best of Richi L )</span></div>
+  </div>
+  <div class="sel" id="sel"></div>
+</section>
+
+<div class="marquee" style="margin-top:clamp(80px,10vw,140px)"><div class="track" id="mq"></div></div>
+
+<section id="watch" class="wrap">
+  <div class="sh rv">
+    <h2>More <i>films</i></h2>
+    <div class="r"><p>其他可以直接观看的作品。</p><span class="mono">( Watch )</span></div>
+  </div>
+  <div class="watch" id="watchGrid"></div>
+</section>
+
+<section id="index" class="wrap">
+  <div class="sh rv">
+    <h2>Index</h2>
+    <div class="r"><p>作品目录，标有 PLAY 的可直接观看。</p><div class="filters" id="filters"></div></div>
+  </div>
+  <div class="idxhead mono"><span>No.</span><span>作品 Title</span><span>类别 Type</span><span>版本 Lang</span><span>月份 Month</span><span>交付 Date</span></div>
+  <ul class="idxlist" id="list"></ul>
+</section>
+
+<section id="timeline" class="wrap">
+  <div class="sh rv">
+    <h2>Time<i>line</i></h2>
+    <div class="r"><p>2026 年 5 月 1 日至 8 月 31 日的交付节点。</p><span class="mono">( 123 days )</span></div>
+  </div>
+  <div class="tl rv"><div class="track" id="track"></div><div class="months" id="months"></div></div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="mono" style="opacity:.6;margin-bottom:24px">( End of reel )</div>
+    <div class="big">Thanks for<br><i>watching.</i></div>
+    <div class="fbot mono"><span>Richi L — AI Video Works</span><span>MEXC · 2026</span><a href="#">Back to top ↑</a></div>
+  </div>
+</footer>
+
+<div class="float" id="float"></div>
+
+<div class="modal" id="modal"><div class="box">
+  <div class="media" id="mMedia"></div>
+  <div class="mb"><div><div class="mono" id="mMeta" style="opacity:.6;margin-bottom:8px"></div><h3 id="mTitle"></h3></div><button id="mClose">Close ✕</button></div>
+</div></div>
+
+<script>
+/* ============ DATA：在 url 填入视频链接（YouTube / mp4 / 任意网址） ============ */
+const WORKS = [
+  {id:'mc',    t:'Master Card 视频',        en:'MEXC Card',                d:'2026.05.06', c:'卡产品',   l:[],       note:'与 Candice A 合作', url:'videos/mastercard.mp4', cv:'covers/mastercard.jpg', dur:'1:01',
+   desc:'AI 生成的生活感短片：咖啡厅里一次刷卡，手机弹出 4% 返现通知，收在 MEXC Card 产品镜头。'},
+  {id:'ai1',   t:'AI 下单策略 · 简版',       en:'AI Order Strategy — Short', d:'2026.05.15', c:'AI 策略',  l:[],       url:'videos/ai-short.mp4', cv:'covers/ai-short.jpg', dur:'1:00',
+   desc:'产品讲解版：用一句话描述策略，AI 自动生成并执行，追踪 X 与 Polymarket 情绪信号，免费、零代码。'},
+  {id:'ai2',   t:'AI 下单策略 · 故事线',     en:'AI Order Strategy — Story', d:'2026.05.22', c:'AI 策略',  l:[],       url:'videos/ai-story.mp4', cv:'covers/ai-story.jpg', dur:'0:59',
+   desc:'动画风格剧情片：交易者睡过头错过行情、自己写代码失败、花 $59/月订阅工具，最后用 MEXC-AI 一句话设置策略。'},
+  {id:'us-en', t:'美股现货视频',             en:'US Stocks Spot',           d:'2026.06.23', c:'美股',     l:['EN'],   url:'videos/us-en.mp4', cv:'covers/us-en.jpg', dur:'1:03',
+   desc:'咖啡厅里的生活感剧情：朋友用 MEXC 买美股，30 秒完成下单，穿插 App 实操画面。英文版。'},
+  {id:'us-tw', t:'美股现货视频',             en:'US Stocks Spot',           d:'2026.06.23', c:'美股',     l:['繁中'], url:'videos/us-tw.mp4', cv:'covers/us-tw.jpg', dur:'1:06',
+   desc:'同一支美股现货剧情片的繁中版本，配繁体字幕与中文界面。'},
+  {id:'us-vi', t:'美股现货视频',             en:'US Stocks Spot',           d:'2026.06.23', c:'美股',     l:['VI'],   url:'videos/us-vi.mp4', cv:'covers/us-vi.jpg', dur:'1:04',
+   desc:'同一支美股现货剧情片的越南语配音版。'},
+  {id:'wc',    t:'世界杯活动',               en:'World Cup Campaign',       d:'2026.07.10', c:'活动',     l:['EN'],   url:'videos/worldcup.mp4', cv:'covers/worldcup.jpg', dur:'0:28',
+   desc:'竖屏活动片：球迷的惊呆反应、一球逆转比分，带出 MEXC 世界杯活动「观赛、互动、做任务赚奖励」。'},
+  {id:'mc-tw', t:'Master Card · 繁体社群版', en:'MEXC Card — Community',    d:'2026.07.16', c:'卡产品',   l:['繁中'], url:'videos/mastercard-tw.mp4', cv:'covers/mastercard-tw.jpg', dur:'0:33', sq:true,
+   desc:'「30 秒看懂 MEXC Card 开卡流程」：7 个步骤、方形版式，专为繁中社群投放。'},
+  {id:'ah-tw', t:'盘后策略教学视频',         en:'After-Hours Strategy',     d:'2026.07.20', c:'美股',     l:['繁中'], url:'videos/after-hours-tw.mp4', cv:'covers/after-hours-tw.jpg', dur:'1:05',
+   desc:'「美股收盘了，为什么价格还在动？」一分钟看懂盘前、盘中与盘后交易，配音加动态信息图。'},
+  {id:'ah-en', t:'盘后策略教学视频 · 英文版',en:'After-Hours Strategy',     d:'2026.08.01', c:'美股',     l:['EN'],   url:''},
+  {id:'grid',  t:'合约网格交易',             en:'Futures Grid Trading',     d:'2026.08.12', c:'合约',     l:['EN'],   url:'videos/futures-grid.mp4', cv:'covers/futures-grid.jpg', dur:'1:01',
+   desc:'英文教学：网格交易原理动画，加上合约网格从选交易对、设方向和格数到启动、停止机器人的完整流程。'},
+  {id:'swap',  t:'闪兑限价',                 en:'Limit Convert',            d:'2026.08.12', c:'产品功能', l:['EN'],   url:'videos/convert-limit.mp4', cv:'covers/convert-limit.jpg', dur:'1:11',
+   desc:'英文教学：App 与网页端的限价闪兑全流程，从创建、确认到管理和撤销订单。'},
+  {id:'copy',  t:'跟单交易 US',              en:'Copy Trading US',          d:'2026.08.12', c:'跟单',     l:['EN'],   url:'videos/copy-trading.mp4', cv:'covers/copy-trading.jpg', dur:'2:32',
+   desc:'英文网页端教学：筛选交易员、三种跟单模式、最低 30 USDT、风控设置到修改参数的完整跟单流程。'},
+  {id:'pre',   t:'盘前交易',                 en:'Pre-Market Trading',       d:'2026.08.12', c:'产品功能', l:['EN'],   url:'videos/pre-market.mp4', cv:'covers/pre-market.jpg', dur:'2:06',
+   desc:'英文教学：代币上市前的场外盘前交易，示范买入、卖出、创建订单与等待交割。'},
+  {id:'team',  t:'团队赛 · 剧情品牌片',      en:'Team Tournament — Brand Film', d:'', c:'团队赛', l:['EN'], note:'英文原版', url:'videos/team-film.mp4', cv:'covers/team-film.jpg', dur:'1:17',
+   desc:'电影感品牌片：从「你总是一个人面对市场吗？」到烛光长桌上的团队，风暴来袭时互相传递面包，落在「赢，从来不是一个人的事」。'},
+  {id:'arena', t:'MEXC Win: Infinity Arena', en:'Infinity Arena — 10M USDT', d:'', c:'团队赛', l:['EN'], note:'英文原版', url:'videos/infinity-arena.mp4', cv:'covers/infinity-arena.jpg', dur:'1:01',
+   desc:'团队赛活动片：奖池最高 10,000,000 USDT，获胜团队最高 300,000 USDT，另有最高 100,000 的美股赛奖励。金色光效的战术长桌串起团队协作。'},
+];
+const TOP = [
+  {ref:'team', t:'团队赛 · 剧情品牌片', en:'Team Tournament — Brand Film', d:'2026', c:'团队赛', l:['EN'],
+   desc:'77 秒电影感品牌片：独自盯盘的女孩收到团队赛邀请，走进烛光长桌；风暴来袭时大家互相传递面包，落在「赢，从来不是一个人的事」。'},
+  {ref:'arena', t:'MEXC Win: Infinity Arena', en:'Infinity Arena — 10M USDT', d:'2026', c:'团队赛', l:['EN'],
+   desc:'团队赛活动片：10,000,000 USDT 奖池、获胜团队最高 300,000 USDT，用金色光效的战术长桌把奖励规则讲成画面。'},
+];
+const TOP_OLD = [
+  {ref:'us-en', t:'美股现货视频', en:'US Stocks Spot', d:'2026.06.23', c:'美股', l:['EN','繁中','VI'],
+   desc:'美股现货主推产品，一套内容制作英文、繁中、越南语三个版本，覆盖多个市场。'},
+  {ref:'ai2', t:'AI 下单策略 · 故事线', en:'AI Order Strategy — Story', d:'2026.05.22', c:'AI 策略', l:[],
+   desc:'动画风格剧情片，把「错过行情 → 自己写代码失败 → 贵价订阅 → MEXC-AI 一句话解决」讲成一个故事；同主题另有简版。'},
+  {ref:'ah-tw', t:'盘后策略教学视频', en:'After-Hours Strategy', d:'2026.07.20 / 08.01', c:'美股', l:['繁中','EN'],
+   desc:'美股盘后交易策略教学，繁中与英文双语。'},
+  {ref:'wc', t:'世界杯活动', en:'World Cup Campaign', d:'2026.07.10', c:'活动', l:[],
+   desc:'结合世界杯热点的活动推广视频。'},
+  {ref:'mc', t:'Master Card 视频', en:'MEXC Card', d:'2026.05.06', c:'卡产品', l:[],
+   desc:'AI 生成的生活感卡产品短片（与 Candice A 合作）；之后另做 30 秒开卡流程的繁体社群版。'},
+];
+/* 新 Top 5：团队赛品牌片 / AI 故事线 / Infinity Arena / Master Card / 美股现货 */
+TOP.splice(1,0,TOP_OLD[1]); TOP.push(TOP_OLD[4], {ref:'ai1', t:'AI 下单策略 · 简版', en:'AI Order Strategy — Short', d:'2026.05.15', c:'AI 策略', l:[],
+   desc:'产品讲解版：用一句话描述策略，AI 自动生成并执行，追踪 X 与 Polymarket 情绪信号；3D 手机与笔电镜头收尾。'});
+/* 海报配色：按类别 */
+const PAL = {
+  '美股':    {bg:'#1f3bff', fg:'#ece8df'},
+  'AI 策略': {bg:'#111110', fg:'#ff4a1c'},
+  '活动':    {bg:'#ff4a1c', fg:'#111110'},
+  '卡产品':  {bg:'#d9d2c3', fg:'#111110'},
+  '合约':    {bg:'#0f5c46', fg:'#ece8df'},
+  '产品功能':{bg:'#f2c230', fg:'#111110'},
+  '跟单':    {bg:'#6b2bd9', fg:'#ece8df'},
+  '团队赛':  {bg:'#3a1d12', fg:'#f2c230'},
+};
+const SHAPES = [
+  p=>`<div class="shape" style="width:78%;aspect-ratio:1;border-radius:50%;background:${p.fg};opacity:.14;right:-22%;top:-30%"></div>`,
+  p=>`<div class="shape" style="inset:0;background:repeating-linear-gradient(90deg,${p.fg}22 0 2px,transparent 2px 22px)"></div>`,
+  p=>`<div class="shape" style="width:60%;height:120%;background:${p.fg};opacity:.12;right:-8%;top:-10%;transform:skewX(-18deg)"></div>`,
+  p=>`<div class="shape" style="width:100%;aspect-ratio:1;border-radius:50%;border:1.5px solid ${p.fg};opacity:.4;right:-45%;top:-20%"></div><div class="shape" style="width:70%;aspect-ratio:1;border-radius:50%;border:1.5px solid ${p.fg};opacity:.4;right:-30%;top:-5%"></div>`,
+  p=>`<div class="shape" style="left:0;right:0;top:44%;height:18%;background:${p.fg};opacity:.13"></div>`,
+];
+const $ = s=>document.querySelector(s);
+const playSvg = '<svg viewBox="0 0 10 12"><path d="M0 0l10 6-10 6z"/></svg>';
+function poster(w,i,size){
+  const src = w.cv ? w : (w.ref ? WORKS.find(x=>x.id===w.ref) : null);
+  if (src && src.cv) {
+    const nfs2 = size==='xl'?'clamp(70px,9vw,150px)':size==='s'?'42px':'clamp(50px,6vw,96px)';
+    return `<div class="poster img" data-v="${src.url}"><img src="${src.cv}" alt="${w.t}"><video muted loop playsinline preload="none"></video>
+      <div class="e">${w.en}${w.l&&w.l.length?' · '+w.l.join(' / '):''}</div>
+      <div class="n" style="font-size:${nfs2}">${String(i+1).padStart(2,'0')}</div>
+      <div class="pl">${playSvg}</div></div>`;
+  }
+  const p = PAL[w.c]||PAL['卡产品'];
+  const fs = size==='xl'?'clamp(44px,6vw,96px)':size==='s'?'34px':'clamp(30px,3.6vw,56px)';
+  const nfs = size==='xl'?'clamp(70px,9vw,150px)':size==='s'?'54px':'clamp(50px,6vw,96px)';
+  return `<div class="poster" style="--pbg:${p.bg};--pfg:${p.fg}">${SHAPES[i%SHAPES.length](p)}
+    <div class="e">${w.en}${w.l&&w.l.length?' · '+w.l.join(' / '):''}</div>
+    <div class="n" style="font-size:${nfs}">${String(i+1).padStart(2,'0')}</div>
+    <div class="t" style="font-size:${fs}">${w.t.replace(' · ','<br>')}</div>
+    <div class="pl">${playSvg}</div></div>`;
+}
+/* marquee */
+const mqText = [...new Set(WORKS.map(w=>w.t.split(' · ')[0]))].map(t=>`<span>${t}</span>`).join('');
+$('#mq').innerHTML = mqText + mqText;
+/* numbers */
+const topics = new Set(WORKS.map(w=>w.t.split(' · ')[0].replace(' 视频','').replace('视频',''))).size;
+const langs = new Set(WORKS.flatMap(w=>w.l)).size;
+if($('#nums')) $('#nums').innerHTML = [
+  [WORKS.length,'支视频作品'],[10,'个内容主题'],[langs,'个语言版本 · EN / 繁中 / VI'],[WORKS.filter(w=>w.url).length,'支成片可在线观看']
+].map(([n,s],i)=>`<div class="num rv"><b data-n="${n}">0${i===0?'<sup>●</sup>':''}</b><span>${s}</span></div>`).join('');
+/* selected */
+$('#sel').innerHTML = TOP.map((w,i)=>`
+  <article class="item rv i${i+1}" data-ref="${w.ref}">
+    <div class="pwrap">${poster(w,i,i===0||i===4?'xl':'m')}</div>
+    <div class="cap">
+      <div class="idx">${String(i+1).padStart(2,'0')}</div>
+      <div><h3>${w.t}<small>${w.en}</small></h3><p class="d">${w.desc}</p>
+        <div class="tags"><span class="tag">${w.c}</span>${w.l.map(x=>`<span class="tag l">${x}</span>`).join('')}</div></div>
+      <div class="meta mono">${w.d}</div>
+    </div>
+  </article>`).join('');
+/* watch */
+const WATCH_ORDER=['team','arena','ai2','mc','ai1','wc','us-en','us-tw','us-vi','ah-tw','mc-tw','grid','copy','pre','swap'];
+const ALLPLAY = WORKS.filter(w=>w.url);
+const TOPIDS = TOP.map(t=>t.ref);
+const PLAYABLE = ALLPLAY.filter(w=>!TOPIDS.includes(w.id)).sort((a,b)=>WATCH_ORDER.indexOf(a.id)-WATCH_ORDER.indexOf(b.id));
+$('#watchGrid').innerHTML = PLAYABLE.map((w,i)=>`
+  <article class="wcard rv" data-ref="${w.id}">${poster(w,i,'s')}
+    <h4>${w.t}${w.l.length?' · '+w.l.join('/'):''}</h4><p>${w.desc}</p>
+    <div class="wm mono"><span>${w.d}</span><span>${w.dur}</span></div></article>`).join('');
+/* index */
+const LIVE='▶ 可观看';
+const cats = ['全部',LIVE,...new Set(WORKS.map(w=>w.c))];
+let cur='全部';
+const cnt=c=>c==='全部'?WORKS.length:c===LIVE?ALLPLAY.length:WORKS.filter(w=>w.c===c).length;
+const renderF=()=>$('#filters').innerHTML=cats.map(c=>`<button class="${c===cur?'on':''}" data-c="${c}">${c}<sup>${cnt(c)}</sup></button>`).join('');
+renderF();
+$('#list').innerHTML = WORKS.map((w,i)=>`
+  <li class="row" data-ref="${w.id}" data-c="${w.c}" data-live="${w.url?1:0}" data-i="${i}">
+    <span class="no">${String(i+1).padStart(2,'0')}</span>
+    <span class="tt">${w.t}${w.url?'<span class="live">Play</span>':''}<small>${w.en}</small></span>
+    <span class="mono">${w.c}</span>
+    <span class="mono">${w.l.length?w.l.join(' / '):'—'}</span>
+    <span class="mono">${['','','','','','May','Jun','Jul','Aug'][+w.d.slice(5,7)]}</span>
+    <span class="mono dt">${w.d||'日期待补'}</span>
+  </li>`).join('');
+$('#filters').addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b) return; cur=b.dataset.c; renderF();
+  document.querySelectorAll('.row').forEach(r=>r.classList.toggle('hide',cur===LIVE?r.dataset.live!=='1':(cur!=='全部'&&r.dataset.c!==cur)));
+});
+/* floating preview */
+const fl=$('#float'); let fx=0,fy=0,tx=0,ty=0;
+document.querySelectorAll('.row').forEach(r=>{
+  r.addEventListener('mouseenter',()=>{const i=+r.dataset.i;fl.innerHTML=poster(WORKS[i],i,'s');fl.classList.add('on');});
+  r.addEventListener('mouseleave',()=>fl.classList.remove('on'));
+});
+/* timeline */
+const start=new Date('2026-05-01'), days=123;
+const pos = d=>((new Date(d.replace(/\./g,'-'))-start)/864e5)/days*100;
+let tk='';
+for(let i=0;i<=days;i+=1){
+  const dt=new Date(start.getTime()+i*864e5);
+  const isM = dt.getDate()===1;
+  if(isM||i%7===0) tk+=`<div class="tick ${isM?'m':''}" style="left:${i/days*100}%">${isM&&i<days?`<em>${dt.toLocaleString('en',{month:'short'}).toUpperCase()} 2026</em>`:''}</div>`;
+}
+const DATED=WORKS.filter(w=>w.d);
+const groups={}; DATED.forEach(w=>(groups[w.d]=groups[w.d]||[]).push(w));
+Object.entries(groups).forEach(([d,ws])=>{
+  tk+=`<div class="mk" style="left:${pos(d)}%">${ws.map(()=>'<i></i>').join('')}<b>${d.slice(5)} · ${ws.length} 支</b></div>`;
+});
+$('#track').innerHTML=tk;
+const ms={}; DATED.forEach(w=>(ms[w.d.slice(5,7)]=ms[w.d.slice(5,7)]||[]).push(w));
+$('#months').innerHTML=Object.keys(ms).sort().map(m=>`<div class="mo"><h4>${['','','','','','May','June','July','Aug'][+m]}<i>${ms[m].length}</i></h4>
+  <ul>${ms[m].map(w=>`<li><span>${w.d.slice(5)}</span>${w.t}${w.l.length?' · '+w.l.join('/'):''}</li>`).join('')}</ul></div>`).join('');
+/* modal */
+function embed(url){
+  const yt=url.match(/(?:youtu\.be\/|v=|shorts\/)([\w-]{11})/);
+  if(yt) return `<iframe src="https://www.youtube.com/embed/${yt[1]}?autoplay=1" allow="autoplay;fullscreen" allowfullscreen></iframe>`;
+  if(/\.(mp4|webm|mov)(\?|$)/i.test(url)) return `<video src="${url}" controls autoplay></video>`;
+  return `<a href="${url}" target="_blank" style="color:#ece8df;border:1px solid;padding:12px 20px;border-radius:99px">在新窗口打开 ↗</a>`;
+}
+document.addEventListener('click',e=>{
+  const el=e.target.closest('[data-ref]'); if(!el) return;
+  const w=WORKS.find(x=>x.id===el.dataset.ref);
+  $('#mTitle').textContent=w.t+(w.l.length?' · '+w.l.join('/'):'');
+  $('#mMeta').textContent=[w.d,w.c,w.en].filter(Boolean).join(' — ');
+  $('#mMedia').innerHTML=w.url?embed(w.url):'该作品暂未收录在线版本';
+  $('#modal').classList.add('open');
+});
+const closeM=()=>{$('#modal').classList.remove('open');$('#mMedia').innerHTML='';};
+$('#mClose').onclick=closeM; $('#modal').addEventListener('click',e=>{if(e.target.id==='modal')closeM();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeM();});
+/* hover preview on posters with video */
+document.addEventListener('mouseover',e=>{
+  const p=e.target.closest('.poster.img'); if(!p||p.classList.contains('playing')) return;
+  const v=p.querySelector('video'); if(!v.src) v.src=p.dataset.v;
+  v.currentTime=0; v.play().then(()=>p.classList.add('playing')).catch(()=>{});
+});
+document.addEventListener('mouseout',e=>{
+  const p=e.target.closest('.poster.img'); if(!p||p.contains(e.relatedTarget)) return;
+  p.classList.remove('playing'); p.querySelector('video').pause();
+});
+/* cursor + float follow */
+const cu=$('#cur'); let cx=innerWidth/2,cy=innerHeight/2,mx=cx,my=cy;
+addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;
+  const hot=e.target.closest('.item,.row'); cu.classList.toggle('big',!!e.target.closest('.item,.wcard'));});
+(function loop(){cx+=(mx-cx)*.2;cy+=(my-cy)*.2;cu.style.left=cx+'px';cu.style.top=cy+'px';
+  tx+=(mx-tx)*.12;ty+=(my-ty)*.12;fl.style.left=(tx+190)+'px';fl.style.top=ty+'px';requestAnimationFrame(loop);})();
+/* clock (Madrid) */
+
+/* reveal + counters */
+const io=new IntersectionObserver(es=>es.forEach(en=>{if(!en.isIntersecting)return;en.target.classList.add('show');
+  const b=en.target.querySelector('[data-n]'); if(b){const n=+b.dataset.n,sup=b.querySelector('sup');let k=0;const t=setInterval(()=>{k++;b.firstChild.nodeValue=k;if(k>=n)clearInterval(t);},60);}
+  io.unobserve(en.target);}),{threshold:.15});
+document.querySelectorAll('.rv').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
