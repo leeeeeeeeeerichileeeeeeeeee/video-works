@@ -330,8 +330,9 @@ const TOP_OLD = [
    desc:'AI 生成的生活感卡产品短片（与 Candice A 合作）；之后另做 30 秒开卡流程的繁体社群版。'},
 ];
 /* 新 Top 5：团队赛品牌片 / AI 故事线 / Infinity Arena / Master Card / 美股现货 */
-TOP.splice(1,0,TOP_OLD[1]); TOP.push(TOP_OLD[4], {ref:'ai1', t:'AI 下单策略 · 简版', en:'AI Order Strategy — Short', d:'2026.05.15', c:'AI 策略', l:[],
-   desc:'产品讲解版：用一句话描述策略，AI 自动生成并执行，追踪 X 与 Polymarket 情绪信号；3D 手机与笔电镜头收尾。'});
+TOP.splice(1,0,TOP_OLD[1]); TOP.push({ref:'ai1', t:'AI 下单策略 · 简版', en:'AI Order Strategy — Short', d:'2026.05.15', c:'AI 策略', l:[],
+   desc:'产品讲解版：用一句话描述策略，AI 自动生成并执行，追踪 X 与 Polymarket 情绪信号；3D 手机与笔电镜头收尾。'}, {ref:'wc', t:'世界杯活动', en:'World Cup Campaign', d:'2026.07.10', c:'活动', l:['EN'],
+   desc:'竖屏活动片：球迷的惊呆反应、一球逆转比分，带出 MEXC 世界杯活动「观赛、互动、做任务赚奖励」。'});
 /* 海报配色：按类别 */
 const PAL = {
   '美股':    {bg:'#1f3bff', fg:'#ece8df'},
@@ -391,12 +392,12 @@ $('#sel').innerHTML = TOP.map((w,i)=>`
     </div>
   </article>`).join('');
 /* watch */
-const WATCH_ORDER=['team','arena','ai2','mc','ai1','wc','us-en','us-tw','us-vi','ah-tw','mc-tw','grid','copy','pre','swap'];
+const WATCH_ORDER=['team','arena','ai2','ai1','wc','mc','us-en','us-tw','us-vi','ah-tw','mc-tw','grid','copy','pre','swap'];
 const ALLPLAY = WORKS.filter(w=>w.url);
 const TOPIDS = TOP.map(t=>t.ref);
 const PLAYABLE = ALLPLAY.filter(w=>!TOPIDS.includes(w.id)).sort((a,b)=>WATCH_ORDER.indexOf(a.id)-WATCH_ORDER.indexOf(b.id));
 $('#watchGrid').innerHTML = PLAYABLE.map((w,i)=>`
-  <article class="wcard rv" data-ref="${w.id}">${poster(w,i,'s')}
+  <article class="wcard rv" data-ref="${w.id}">${poster(w,i+TOP.length,'s')}
     <h4>${w.t}${w.l.length?' · '+w.l.join('/'):''}</h4><p>${w.desc}</p>
     <div class="wm mono"><span>${w.d}</span><span>${w.dur}</span></div></article>`).join('');
 /* index */
